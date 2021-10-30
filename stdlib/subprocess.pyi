@@ -1,8 +1,9 @@
 import sys
 from _typeshed import Self, StrOrBytesPath
 from types import TracebackType
-from typing import IO, Any, AnyStr, Callable, Generic, Iterable, Mapping, Sequence, Type, TypeVar, Union, overload
+from typing import IO, Any, AnyStr, Callable, Generic, Iterable, Mapping, Sequence, Type, TypeVar, Union, overload, BinaryIO
 from typing_extensions import Literal
+from io import BufferedReader
 
 if sys.version_info >= (3, 9):
     from types import GenericAlias
@@ -35,6 +36,7 @@ else:
     _ENV = Union[Mapping[bytes, StrOrBytesPath], Mapping[str, StrOrBytesPath]]
 
 _T = TypeVar("_T")
+_Reader = TypeVar("_Reader", BufferedReader, BinaryIO)
 
 class CompletedProcess(Generic[_T]):
     # morally: _CMD
@@ -704,7 +706,7 @@ class CalledProcessError(SubprocessError):
     stderr: Any
     def __init__(self, returncode: int, cmd: _CMD, output: _TXT | None = ..., stderr: _TXT | None = ...) -> None: ...
 
-class Popen(Generic[AnyStr]):
+class Popen(Generic[AnyStr, _Reader]):
     args: _CMD
     stdin: IO[AnyStr] | None
     stdout: IO[AnyStr] | None
@@ -717,6 +719,159 @@ class Popen(Generic[AnyStr]):
     # but this shouldn't come up hopefully?
 
     if sys.version_info >= (3, 7):
+        # _Reader is `BufferedReader`
+        @overload
+        def __new__(
+            cls,
+            args: _CMD,
+            bufsize: Literal[-1, 1] = -1,
+            executable: StrOrBytesPath | None = ...,
+            stdin: _FILE | None = ...,
+            stdout: _FILE | None = ...,
+            stderr: _FILE | None = ...,
+            preexec_fn: Callable[[], Any] | None = ...,
+            close_fds: bool = ...,
+            shell: bool = ...,
+            cwd: StrOrBytesPath | None = ...,
+            env: _ENV | None = ...,
+            universal_newlines: bool = ...,
+            startupinfo: Any | None = ...,
+            creationflags: int = ...,
+            restore_signals: bool = ...,
+            start_new_session: bool = ...,
+            pass_fds: Any = ...,
+            *,
+            text: bool | None = ...,
+            encoding: str,
+            errors: str | None = ...,
+        ) -> Popen[str, BufferedReader]: ...
+        @overload
+        def __new__(
+            cls,
+            args: _CMD,
+            bufsize: Literal[-1, 1] = -1,
+            executable: StrOrBytesPath | None = ...,
+            stdin: _FILE | None = ...,
+            stdout: _FILE | None = ...,
+            stderr: _FILE | None = ...,
+            preexec_fn: Callable[[], Any] | None = ...,
+            close_fds: bool = ...,
+            shell: bool = ...,
+            cwd: StrOrBytesPath | None = ...,
+            env: _ENV | None = ...,
+            universal_newlines: bool = ...,
+            startupinfo: Any | None = ...,
+            creationflags: int = ...,
+            restore_signals: bool = ...,
+            start_new_session: bool = ...,
+            pass_fds: Any = ...,
+            *,
+            text: bool | None = ...,
+            encoding: str | None = ...,
+            errors: str,
+        ) -> Popen[str, BufferedReader]: ...
+        @overload
+        def __new__(
+            cls,
+            args: _CMD,
+            bufsize: Literal[-1, 1] = -1,
+            executable: StrOrBytesPath | None = ...,
+            stdin: _FILE | None = ...,
+            stdout: _FILE | None = ...,
+            stderr: _FILE | None = ...,
+            preexec_fn: Callable[[], Any] | None = ...,
+            close_fds: bool = ...,
+            shell: bool = ...,
+            cwd: StrOrBytesPath | None = ...,
+            env: _ENV | None = ...,
+            *,
+            universal_newlines: Literal[True],
+            startupinfo: Any | None = ...,
+            creationflags: int = ...,
+            restore_signals: bool = ...,
+            start_new_session: bool = ...,
+            pass_fds: Any = ...,
+            # where the *real* keyword only args start
+            text: bool | None = ...,
+            encoding: str | None = ...,
+            errors: str | None = ...,
+        ) -> Popen[str, BufferedReader]: ...
+        @overload
+        def __new__(
+            cls,
+            args: _CMD,
+            bufsize: Literal[-1, 1] = -1,
+            executable: StrOrBytesPath | None = ...,
+            stdin: _FILE | None = ...,
+            stdout: _FILE | None = ...,
+            stderr: _FILE | None = ...,
+            preexec_fn: Callable[[], Any] | None = ...,
+            close_fds: bool = ...,
+            shell: bool = ...,
+            cwd: StrOrBytesPath | None = ...,
+            env: _ENV | None = ...,
+            universal_newlines: bool = ...,
+            startupinfo: Any | None = ...,
+            creationflags: int = ...,
+            restore_signals: bool = ...,
+            start_new_session: bool = ...,
+            pass_fds: Any = ...,
+            *,
+            text: Literal[True],
+            encoding: str | None = ...,
+            errors: str | None = ...,
+        ) -> Popen[str, BufferedReader]: ...
+        @overload
+        def __new__(
+            cls,
+            args: _CMD,
+            bufsize: Literal[-1, 1] = -1,
+            executable: StrOrBytesPath | None = ...,
+            stdin: _FILE | None = ...,
+            stdout: _FILE | None = ...,
+            stderr: _FILE | None = ...,
+            preexec_fn: Callable[[], Any] | None = ...,
+            close_fds: bool = ...,
+            shell: bool = ...,
+            cwd: StrOrBytesPath | None = ...,
+            env: _ENV | None = ...,
+            universal_newlines: Literal[False] = ...,
+            startupinfo: Any | None = ...,
+            creationflags: int = ...,
+            restore_signals: bool = ...,
+            start_new_session: bool = ...,
+            pass_fds: Any = ...,
+            *,
+            text: Literal[None, False] = ...,
+            encoding: None = ...,
+            errors: None = ...,
+        ) -> Popen[bytes, BufferedReader]: ...
+        @overload
+        def __new__(
+            cls,
+            args: _CMD,
+            bufsize: Literal[-1, 1] = -1,
+            executable: StrOrBytesPath | None = ...,
+            stdin: _FILE | None = ...,
+            stdout: _FILE | None = ...,
+            stderr: _FILE | None = ...,
+            preexec_fn: Callable[[], Any] | None = ...,
+            close_fds: bool = ...,
+            shell: bool = ...,
+            cwd: StrOrBytesPath | None = ...,
+            env: _ENV | None = ...,
+            universal_newlines: bool = ...,
+            startupinfo: Any | None = ...,
+            creationflags: int = ...,
+            restore_signals: bool = ...,
+            start_new_session: bool = ...,
+            pass_fds: Any = ...,
+            *,
+            text: bool | None = ...,
+            encoding: str | None = ...,
+            errors: str | None = ...,
+        ) -> Popen[Any, BufferedReader]: ...
+        # _Reader is `BinaryIO`
         # text is added in 3.7
         @overload
         def __new__(
@@ -742,7 +897,7 @@ class Popen(Generic[AnyStr]):
             text: bool | None = ...,
             encoding: str,
             errors: str | None = ...,
-        ) -> Popen[str]: ...
+        ) -> Popen[str, BinaryIO]: ...
         @overload
         def __new__(
             cls,
@@ -767,7 +922,7 @@ class Popen(Generic[AnyStr]):
             text: bool | None = ...,
             encoding: str | None = ...,
             errors: str,
-        ) -> Popen[str]: ...
+        ) -> Popen[str, BinaryIO]: ...
         @overload
         def __new__(
             cls,
@@ -793,7 +948,7 @@ class Popen(Generic[AnyStr]):
             text: bool | None = ...,
             encoding: str | None = ...,
             errors: str | None = ...,
-        ) -> Popen[str]: ...
+        ) -> Popen[str, BinaryIO]: ...
         @overload
         def __new__(
             cls,
@@ -818,7 +973,7 @@ class Popen(Generic[AnyStr]):
             text: Literal[True],
             encoding: str | None = ...,
             errors: str | None = ...,
-        ) -> Popen[str]: ...
+        ) -> Popen[str, BinaryIO]: ...
         @overload
         def __new__(
             cls,
@@ -843,7 +998,7 @@ class Popen(Generic[AnyStr]):
             text: Literal[None, False] = ...,
             encoding: None = ...,
             errors: None = ...,
-        ) -> Popen[bytes]: ...
+        ) -> Popen[bytes, BinaryIO]: ...
         @overload
         def __new__(
             cls,
@@ -868,8 +1023,131 @@ class Popen(Generic[AnyStr]):
             text: bool | None = ...,
             encoding: str | None = ...,
             errors: str | None = ...,
-        ) -> Popen[Any]: ...
+        ) -> Popen[Any, BinaryIO]: ...
     else:
+        # _Reader is `BufferedReader`
+        @overload
+        def __new__(
+            cls,
+            args: _CMD,
+            bufsize: Literal[-1, 1] = -1,
+            executable: StrOrBytesPath | None = ...,
+            stdin: _FILE | None = ...,
+            stdout: _FILE | None = ...,
+            stderr: _FILE | None = ...,
+            preexec_fn: Callable[[], Any] | None = ...,
+            close_fds: bool = ...,
+            shell: bool = ...,
+            cwd: StrOrBytesPath | None = ...,
+            env: _ENV | None = ...,
+            universal_newlines: bool = ...,
+            startupinfo: Any | None = ...,
+            creationflags: int = ...,
+            restore_signals: bool = ...,
+            start_new_session: bool = ...,
+            pass_fds: Any = ...,
+            *,
+            encoding: str,
+            errors: str | None = ...,
+        ) -> Popen[str, BufferedReader]: ...
+        @overload
+        def __new__(
+            cls,
+            args: _CMD,
+            bufsize: Literal[-1, 1] = -1,
+            executable: StrOrBytesPath | None = ...,
+            stdin: _FILE | None = ...,
+            stdout: _FILE | None = ...,
+            stderr: _FILE | None = ...,
+            preexec_fn: Callable[[], Any] | None = ...,
+            close_fds: bool = ...,
+            shell: bool = ...,
+            cwd: StrOrBytesPath | None = ...,
+            env: _ENV | None = ...,
+            universal_newlines: bool = ...,
+            startupinfo: Any | None = ...,
+            creationflags: int = ...,
+            restore_signals: bool = ...,
+            start_new_session: bool = ...,
+            pass_fds: Any = ...,
+            *,
+            encoding: str | None = ...,
+            errors: str,
+        ) -> Popen[str, BufferedReader]: ...
+        @overload
+        def __new__(
+            cls,
+            args: _CMD,
+            bufsize: Literal[-1, 1] = -1,
+            executable: StrOrBytesPath | None = ...,
+            stdin: _FILE | None = ...,
+            stdout: _FILE | None = ...,
+            stderr: _FILE | None = ...,
+            preexec_fn: Callable[[], Any] | None = ...,
+            close_fds: bool = ...,
+            shell: bool = ...,
+            cwd: StrOrBytesPath | None = ...,
+            env: _ENV | None = ...,
+            *,
+            universal_newlines: Literal[True],
+            startupinfo: Any | None = ...,
+            creationflags: int = ...,
+            restore_signals: bool = ...,
+            start_new_session: bool = ...,
+            pass_fds: Any = ...,
+            # where the *real* keyword only args start
+            encoding: str | None = ...,
+            errors: str | None = ...,
+        ) -> Popen[str, BufferedReader]: ...
+        @overload
+        def __new__(
+            cls,
+            args: _CMD,
+            bufsize: Literal[-1, 1] = -1,
+            executable: StrOrBytesPath | None = ...,
+            stdin: _FILE | None = ...,
+            stdout: _FILE | None = ...,
+            stderr: _FILE | None = ...,
+            preexec_fn: Callable[[], Any] | None = ...,
+            close_fds: bool = ...,
+            shell: bool = ...,
+            cwd: StrOrBytesPath | None = ...,
+            env: _ENV | None = ...,
+            universal_newlines: Literal[False] = ...,
+            startupinfo: Any | None = ...,
+            creationflags: int = ...,
+            restore_signals: bool = ...,
+            start_new_session: bool = ...,
+            pass_fds: Any = ...,
+            *,
+            encoding: None = ...,
+            errors: None = ...,
+        ) -> Popen[bytes, BufferedReader]: ...
+        @overload
+        def __new__(
+            cls,
+            args: _CMD,
+            bufsize: Literal[-1, 1] = -1,
+            executable: StrOrBytesPath | None = ...,
+            stdin: _FILE | None = ...,
+            stdout: _FILE | None = ...,
+            stderr: _FILE | None = ...,
+            preexec_fn: Callable[[], Any] | None = ...,
+            close_fds: bool = ...,
+            shell: bool = ...,
+            cwd: StrOrBytesPath | None = ...,
+            env: _ENV | None = ...,
+            universal_newlines: bool = ...,
+            startupinfo: Any | None = ...,
+            creationflags: int = ...,
+            restore_signals: bool = ...,
+            start_new_session: bool = ...,
+            pass_fds: Any = ...,
+            *,
+            encoding: str | None = ...,
+            errors: str | None = ...,
+        ) -> Popen[Any, BufferedReader]: ...
+        # _Reader is `BinaryIO`
         @overload
         def __new__(
             cls,
@@ -893,7 +1171,7 @@ class Popen(Generic[AnyStr]):
             *,
             encoding: str,
             errors: str | None = ...,
-        ) -> Popen[str]: ...
+        ) -> Popen[str, BinaryIO]: ...
         @overload
         def __new__(
             cls,
@@ -917,7 +1195,7 @@ class Popen(Generic[AnyStr]):
             *,
             encoding: str | None = ...,
             errors: str,
-        ) -> Popen[str]: ...
+        ) -> Popen[str, BinaryIO]: ...
         @overload
         def __new__(
             cls,
@@ -942,7 +1220,7 @@ class Popen(Generic[AnyStr]):
             # where the *real* keyword only args start
             encoding: str | None = ...,
             errors: str | None = ...,
-        ) -> Popen[str]: ...
+        ) -> Popen[str, BinaryIO]: ...
         @overload
         def __new__(
             cls,
@@ -966,7 +1244,7 @@ class Popen(Generic[AnyStr]):
             *,
             encoding: None = ...,
             errors: None = ...,
-        ) -> Popen[bytes]: ...
+        ) -> Popen[bytes, BinaryIO]: ...
         @overload
         def __new__(
             cls,
@@ -990,7 +1268,7 @@ class Popen(Generic[AnyStr]):
             *,
             encoding: str | None = ...,
             errors: str | None = ...,
-        ) -> Popen[Any]: ...
+        ) -> Popen[Any, BinaryIO]: ...
     def poll(self) -> int | None: ...
     if sys.version_info >= (3, 7):
         def wait(self, timeout: float | None = ...) -> int: ...
